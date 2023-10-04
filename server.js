@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 
 // routes 
 const userRoutes = require('./routes/userRoutes');
+const s3Router = require('./routes/s3Upload');
 
 // connect to db
 const connectDB = async () => {
@@ -30,6 +31,8 @@ connectDB();
 
 const app = express();
 
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -39,6 +42,7 @@ app.get('/', (req, res) => {
 
 app.use(auth);
 app.use(userRoutes);
+app.use(s3Router)
 
 const port = process.env.PORT || 5000
 
