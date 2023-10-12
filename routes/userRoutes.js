@@ -65,11 +65,11 @@ router.post('/login', async (req, res, next) => {
     let user = await User.findOne({ email: req.body.credentials.email })
 
     if (!user) {
-      throw new BadCredentialsError()
+      res.status(200).json({ msg: 'email not found' })
     } else {
       let correctPassword = await bcrypt.compare(pw, user.hashedPassword)
       if (!correctPassword) {
-        throw new BadCredentialsError()
+        res.status(200).json({ msg: 'incorrect password' })
       } else {
         const token = crypto.randomBytes(16).toString('hex')
         user.token = token
