@@ -113,19 +113,18 @@ router.patch('/change-password', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-// update a single user 
-router.patch('/user/:id', requireToken, (req, res, next) => {
-  let id = req.params.id
-  let data = req.body.user
-  User.findById(id) 
-      .then(user => {
-          user.set(data)
-          return user.save()
-      })
-      .then(user => {
-          res.json({ user })
-      })
-      .catch(next)
+// update a single user's stripe account id 
+router.patch('/user/:id/update-id', requireToken, async (req, res, next) => {
+  const id = req.params.id
+  let user = await User.findById(id)
+
+  const { newStripeId } = req.body
+
+  // needs a try catch
+  user.stripeId = newStripeId
+  const updatedUser = await user.save()
+  res.json({ user: updatedUser })
+
 })
 
 //update a users shipping address 
@@ -161,21 +160,21 @@ router.get('/user/:id', async (req, res) => {
   res.json({ user: user })
 })
 
-router.patch('/user/:id/sub_success', requireToken, async (req, res, next) => {
-  let id = req.params.id
-  let user = await User.findById(id)
+// router.patch('/user/:id/sub_success', requireToken, async (req, res, next) => {
+//   let id = req.params.id
+//   let user = await User.findById(id)
 
-  const { sessionId } = req.body
+//   const { sessionId } = req.body
 
-  if (user.subscribed === false) {
-    user.subscribed = true
-    user.sessionId = sessionId
-    const updatedUser = await user.save()
-    res.json({ user: updatedUser })
-  } else {
-    res.json({ user: user })
-  }
-})
+//   if (user.subscribed === false) {
+//     user.subscribed = true
+//     user.sessionId = sessionId
+//     const updatedUser = await user.save()
+//     res.json({ user: updatedUser })
+//   } else {
+//     res.json({ user: user })
+//   }
+// })
 
 // GET ALL USERS
 router.get('/users', requireToken, async (req, res, next) => {

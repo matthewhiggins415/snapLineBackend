@@ -23,6 +23,10 @@ const userSchema = new Schema({
     type: Boolean, 
     default: false
   }, 
+  stripeId: {
+    type: String, 
+    required: false
+  },
   isPhotographer: {
     type: Boolean, 
     default: false
