@@ -11,8 +11,9 @@ const bodyParser = require('body-parser');
 
 // routes 
 const userRoutes = require('./routes/userRoutes');
-const s3Router = require('./routes/s3Upload');
+// const s3Router = require('./routes/s3Upload');
 const stripeRoutes = require('./routes/stripeRoutes');
+const firebaseRoutes = require('./routes/firebase');
 
 // connect to db
 const connectDB = async () => {
@@ -43,8 +44,9 @@ app.get('/', (req, res) => {
 
 app.use(auth);
 app.use(userRoutes);
-app.use(s3Router)
+// app.use(s3Router)
 app.use(stripeRoutes);
+app.use(firebaseRoutes)
 
 const port = process.env.PORT || 5000
 
