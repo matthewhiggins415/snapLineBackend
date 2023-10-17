@@ -3,6 +3,8 @@ const { initializeApp } = require('firebase/app');
 const multer = require('multer');
 const passport = require('passport');
 const requireToken = passport.authenticate('bearer', { session: false });
+const User = require('../models/userModel')
+const { ObjectId } = require('mongodb');
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,14 +33,23 @@ const upload = multer();
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app)
 
-router.post('/upload', requireToken, upload.array('images', 5), async (req, res) => {
+router.post('/upload', requireToken, upload.array('images', 10), async (req, res) => {
   console.log(req.files)
+  console.log(req.user._id)
+  console.log(req.body.location)
+  console.log(req.body.price)
+  console.log(req.body.date)
+
+  const userIdObj = new ObjectId(req.user._id);
+  const userId = userIdObj.toString();
+  console.log(userId)
+
   if (!req.files || req.files.length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
 
   const promises = req.files.map(async (file, index) => {
-    const storageRef = ref(storage, `images/image${index + 1}.jpg`);
+    const storageRef = ref(storage, `${req.user.email}/images/image${index + 1}.jpg`);
 
     try {
       // Upload the file to Firebase Storage
@@ -46,7 +57,15 @@ router.post('/upload', requireToken, upload.array('images', 5), async (req, res)
 
       // Get the download URL for the uploaded file
       const downloadURL = await getDownloadURL(storageRef);
+      
       console.log(`File ${index + 1} uploaded. Download URL: ${downloadURL}`);
+
+      // find the user 
+      // create album 
+      // add image to album 
+      // give each image in firebase a uiid 
+
+      return downloadURL;
     } catch (error) {
       console.error(error);
       throw new Error('Error uploading images to Firebase Storage.');
@@ -54,8 +73,8 @@ router.post('/upload', requireToken, upload.array('images', 5), async (req, res)
   });
 
   try {
-    await Promise.all(promises);
-    res.status(200).send('Images uploaded successfully.');
+    const downloadURLs = await Promise.all(promises);
+    res.status(200).json({ msg: 'Images uploaded successfully', downloadURLs});
   } catch (error) {
     console.error(error);
     res.status(500).send('Error uploading images to Firebase Storage.');
