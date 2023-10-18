@@ -49,7 +49,7 @@ router.post('/upload', requireToken, upload.array('images', 10), async (req, res
   }
 
   const promises = req.files.map(async (file, index) => {
-    const storageRef = ref(storage, `${req.user.email}/images/image${index + 1}.jpg`);
+    const storageRef = ref(storage, `/images/image${index + 1}.jpg`);
 
     try {
       // Upload the file to Firebase Storage
