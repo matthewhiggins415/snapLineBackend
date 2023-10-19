@@ -35,6 +35,10 @@ const userSchema = new Schema({
     type: String, 
     required: true
   },
+  albums: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Album'
+  }],
   token: String,
 }, {
   timestamps: true, 

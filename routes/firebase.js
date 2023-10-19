@@ -49,7 +49,7 @@ router.post('/upload', requireToken, upload.array('images', 10), async (req, res
   }
 
   const promises = req.files.map(async (file, index) => {
-    const storageRef = ref(storage, `/images/image${index + 1}.jpg`);
+  const storageRef = ref(storage, `/images/image${index + 1}.jpg`);
 
     try {
       // Upload the file to Firebase Storage
@@ -69,6 +69,40 @@ router.post('/upload', requireToken, upload.array('images', 10), async (req, res
     } catch (error) {
       console.error(error);
       throw new Error('Error uploading images to Firebase Storage.');
+    }
+  });
+
+  try {
+    const downloadURLs = await Promise.all(promises);
+    res.status(200).json({ msg: 'Images uploaded successfully', downloadURLs});
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error uploading images to Firebase Storage.');
+  }
+});
+
+// Upload user image to firebase 
+router.post('/user/upload-user-image', requireToken, upload.array('images', 1), async (req, res, next) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+
+  const promises = req.files.map(async (file, index) => {
+  const storageRef = ref(storage, `/images/image${index + 1}.jpg`);
+
+    try {
+      await uploadBytes(storageRef, file.buffer);
+
+      // Get the download URL for the uploaded file
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      console.log(`File ${index + 1} uploaded. Download URL: ${downloadURL}`);
+      // give each image in firebase a uiid 
+
+      return downloadURL;
+    } catch(error) {
+      console.error(error);
+      res.status(500).send('Error uploading images to Firebase Storage.');
     }
   });
 

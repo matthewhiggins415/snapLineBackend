@@ -142,6 +142,27 @@ router.patch('/user/:id/update-id', requireToken, async (req, res, next) => {
 //   })
 // })
 
+// UPODATE USERS PROFILE IMAGE
+router.put('/user-image-update', requireToken, async (req, res, next) => {
+  let newImageUrl = req.body.data;
+  console.log("New Image URL type: ", typeof newImageUrl);
+  console.log("New Image URL: ", newImageUrl);
+
+  let userID = req.user._id
+
+  let user = await User.findById(userID)
+  
+  console.log("user found in db: ", user)
+
+  user.picture = newImageUrl;
+  
+  let updatedUser = await user.save();
+
+  console.log("UPDATED USER: ", updatedUser)
+
+  res.json({ updatedUser })
+})
+
 // LOGOUT 
 // works
 router.delete('/logout', requireToken, (req, res, next) => {
