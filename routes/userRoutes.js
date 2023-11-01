@@ -29,16 +29,21 @@ const router = express.Router()
 // works
 router.post('/register', async (req, res, next) => {
   const { credentials } = req.body
-  const { email, password, password_confirmation } = credentials
+  const { firstName, lastName, email, password, password_confirmation } = credentials
+
+  console.log("firstName", firstName);
+  console.log("lastName", lastName)
 
   try {
-    if (!email || !password || password !== password_confirmation) {
+    if (!firstName || !lastName || !email || !password || password !== password_confirmation) {
       res.json({msg: "registration failed"})
     }
 
     const hash = await bcrypt.hash(password, bcryptSaltRounds)
 
     const userObj = {
+      firstName: firstName, 
+      lastName: lastName,
       email: email,
       hashedPassword: hash
     }

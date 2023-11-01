@@ -13,6 +13,8 @@ const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const stripeRoutes = require('./routes/stripeRoutes');
 const firebaseRoutes = require('./routes/firebase');
+const albumRoutes = require('./routes/albumRoutes.js');
+const imageRoutes = require('./routes/imageRoutes.js')
 
 // connect to db
 const connectDB = async () => {
@@ -44,10 +46,10 @@ app.get('/', (req, res) => {
 app.use(auth);
 app.use(userRoutes);
 app.use(stripeRoutes);
-app.use(firebaseRoutes)
+app.use(firebaseRoutes);
+app.use(albumRoutes);
+app.use(imageRoutes);
 
 const port = process.env.PORT || 5000
 
 app.listen(port, console.log(`server running in ${process.env.NODE_ENV} mode on port ${port}`.blue.bold))
-
-
