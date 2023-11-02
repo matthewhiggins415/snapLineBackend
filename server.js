@@ -14,7 +14,8 @@ const userRoutes = require('./routes/userRoutes');
 const stripeRoutes = require('./routes/stripeRoutes');
 const firebaseRoutes = require('./routes/firebase');
 const albumRoutes = require('./routes/albumRoutes.js');
-const imageRoutes = require('./routes/imageRoutes.js')
+const imageRoutes = require('./routes/imageRoutes.js');
+const photographerRoutes = require('./routes/photographerRoutes.js');
 
 // connect to db
 const connectDB = async () => {
@@ -49,6 +50,7 @@ app.use(stripeRoutes);
 app.use(firebaseRoutes);
 app.use(albumRoutes);
 app.use(imageRoutes);
+app.use(photographerRoutes);
 
 const port = process.env.PORT || 5000
 
