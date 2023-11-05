@@ -41,9 +41,12 @@ router.post('/register', async (req, res, next) => {
 
     const hash = await bcrypt.hash(password, bcryptSaltRounds)
 
+    let name = firstName + " " + lastName
+
     const userObj = {
       firstName: firstName, 
       lastName: lastName,
+      fullName: name,
       email: email,
       hashedPassword: hash
     }

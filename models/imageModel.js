@@ -14,6 +14,9 @@ const imageSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
+    photographerName: {
+      type: String, 
+    },
     sport: {
       type: String,
       required: true

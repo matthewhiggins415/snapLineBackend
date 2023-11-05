@@ -63,19 +63,13 @@ router.get('/album/:id', async (req, res, next) => {
 // read all albums 
 router.get('/albums/:id', async (req, res, next) => {
   const id = req.params.id
-
-  console.log("id: ", id)
-
   let albums = []
 
   try {
     let user = await User.findById(id)
     let albumIDs = user.albums
 
-    console.log(user.albums)
-
     for (const albumID of albumIDs) {
-      console.log(albumID)
       try {
         const album = await Album.findById(albumID);
         if (album) {

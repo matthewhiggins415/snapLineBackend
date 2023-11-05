@@ -13,15 +13,19 @@ router.post('/newimage', requireToken, async (req, res, next) => {
   console.log("user: ", req.user);
   console.log("req body data: ", req.body.data.albumID);
   console.log("req body: ", req.body);
+  console.log(req.user)
 
   const album = await Album.findById(req.body.data.albumID)
 
   console.log("album: ", album)
 
+  const name = req.user.firstName + " " + req.user.lastName
+
   const imgObj = {
     album: req.body.data.albumID,
     url: req.body.data.imgURL,
     photographer: req.user._id,
+    photographerName: name,
     sport: album.sport,
     location: album.location,
     date:  album.date
@@ -44,13 +48,36 @@ router.post('/newimage', requireToken, async (req, res, next) => {
   }
 })
 
-// read an image 
+// read an individual image
+
+// read recent images
+router.get('/recent/images', async (req, res, next) => {
+  try {
+    const today = new Date();
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(today.getDate() - 2);
+
+    let images = await Image.find({
+      createdAt: {
+        $gte: twoDaysAgo,
+        $lt: today,
+      }, 
+      purchased: false
+    })
+    
+    const limitedImagesArr = images.slice(0, 20);
+    res.json({ images: limitedImagesArr })
+  } catch(error) {
+    console.log(error)
+  }
+})
 
 // read all images from an album
-router.get(`/album/:id/images`, requireToken, async (req, res, next) => {
+router.get(`/album/:id/images`, async (req, res, next) => {
   console.log("req.params.id: ", req.params.id)
 
-  const album = await Album.findById(req.params.id)
+  const album = await Album.findById(req.params.id);
+  console.log("album", album)
 
   let imageArr = []
 
