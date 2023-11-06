@@ -67,8 +67,10 @@ router.post('/user/upload-user-image', requireToken, upload.array('images', 1), 
     return res.status(400).send('No files were uploaded.');
   }
 
+  const uuid = uuidv4();
+
   const promises = req.files.map(async (file, index) => {
-  const storageRef = ref(storage, `/images/image${index + 1}.jpg`);
+  const storageRef = ref(storage, `/images/image${uuid}.jpg`);
 
     try {
       await uploadBytes(storageRef, file.buffer);
