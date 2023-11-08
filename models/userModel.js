@@ -46,6 +46,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Album'
   }],
+  cart: [{}],
   token: String,
 }, {
   timestamps: true, 
