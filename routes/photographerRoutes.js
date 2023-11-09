@@ -30,4 +30,18 @@ router.get(`/featuredPhotographers`, async (req, res, next) => {
   }
 })
 
+router.post(`/photographers/search`, async (req, res, next) => {
+  let value = req.body.searchValue
+  console.log(value)
+
+  try {
+    let photographers = await User.find({ isPhotographer: true, fullName:{ $regex: new RegExp(`^${value}`, 'i') } })
+    console.log(photographers)
+    const limitedArr = photographers.slice(0, 10);
+    res.json({ users: limitedArr })
+  } catch(err) {
+    console.log(error)
+  }
+})
+
 module.exports = router
