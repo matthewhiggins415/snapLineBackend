@@ -135,6 +135,9 @@ router.patch('/user/:id/update-id', requireToken, async (req, res, next) => {
 
 })
 
+
+// add photographer to users subscribedTo
+
 //update a users shipping address 
 // router.patch('/user/address/:id', requireToken, (req, res, next) => {
 //   let id = req.params.id

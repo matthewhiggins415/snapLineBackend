@@ -46,6 +46,14 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Album'
   }],
+  subscribers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  subscribedTo: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   cart: [{}],
   token: String,
 }, {
