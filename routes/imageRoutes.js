@@ -55,7 +55,7 @@ router.get('/recent/images', async (req, res, next) => {
   try {
     const today = new Date();
     const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(today.getDate() - 4);
+    twoDaysAgo.setDate(today.getDate() - 6);
 
     let images = await Image.find({
       createdAt: {

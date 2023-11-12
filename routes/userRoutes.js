@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt')
 
 // see above for explanation of "salting", 10 rounds is recommended
 const bcryptSaltRounds = 10
+const nodemailer = require('nodemailer');
+
 
 // pull in error types and the logic to handle them and set status codes
 // const errors = require('../lib/custom_errors')
@@ -56,6 +58,30 @@ router.post('/register', async (req, res, next) => {
     const token = crypto.randomBytes(16).toString('hex')
     user.token = token 
     await user.save()
+
+    // send email 
+    let transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.EMAIL_ADDRESS, // your Gmail address
+        pass: process.env.EMAIL_PASS,    // your Gmail password
+      },
+    });
+    
+    let mailOptions = {
+      from: process.env.EMAIL_ADDRESS,
+      to: email,
+      subject: 'Welcome to PIX Marketplace',
+      text: `Hey there, your account has been created`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
 
     res.json({ user: user })
   } catch (err) {
