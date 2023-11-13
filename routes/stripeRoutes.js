@@ -13,11 +13,17 @@ const Image = require('../models/imageModel')
 
 // create the account
 router.get('/create-account', async (req, res, next) => {
-  const account = await stripe.accounts.create({
-    type: 'express',
-  });
+  try {
+    const account = await stripe.accounts.create({
+      type: 'express',
+    });
 
-  res.json({ account: account });
+    console.log("account:", account)
+  
+    res.json({ account: account });
+  } catch (error) {
+    console.log(error)
+  }
 });
 
 
