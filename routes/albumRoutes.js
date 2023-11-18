@@ -12,14 +12,10 @@ router.post('/newAlbum', requireToken, async (req, res, next) => {
   const { sport, location, date } = req.body.data;
   const user = req.user
 
-  console.log("DATE:", date)
-
   const inputDate = date;
   const dateObject = new Date(inputDate);
   const options = { month: 'long', day: 'numeric', year: 'numeric' };
   const formattedDate = dateObject.toLocaleDateString('en-US', options);
-
-  console.log(formattedDate);
 
   albumObj = {
     sport: sport, 
@@ -36,8 +32,6 @@ router.post('/newAlbum', requireToken, async (req, res, next) => {
       { new: true }
     );
 
-    console.log("updated user: ", updatedUser);
-
     res.status(201).json(newAlbum);
   } catch(e) {
     console.log(e)
@@ -49,11 +43,8 @@ router.post('/newAlbum', requireToken, async (req, res, next) => {
 router.get('/album/:id', async (req, res, next) => {
   const id = req.params.id
 
-  console.log("id: ", id)
-
   try {
     let album = await Album.findById(id)
-    console.log(album)
     res.json({ album: album })
   } catch(error) {
     console.log(error)

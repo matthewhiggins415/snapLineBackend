@@ -15,7 +15,7 @@ const Image = require('../models/imageModel')
 router.get('/create-account', async (req, res, next) => {
   try {
     const account = await stripe.accounts.create({
-      type: 'express',
+      type: 'standard',
     });
 
     console.log("account:", account)
@@ -102,6 +102,38 @@ router.patch('/cart/:itemID/remove', requireToken, async (req, res, next) => {
     console.log(error)
   }
 })
+
+// Webhook for when user completes photographer application through stripe
+const endpointSecret = "whsec_0bfb2fbf1727b4b43217432b9e9f4d2c3e5cd3e875cd40506a0cd03c957c929d";
+
+router.post('/webhook/account-created', express.raw({type: 'application/json'}), (request, response) => {
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+   // Handle the event
+   switch (event.type) {
+    case 'account.external_account.created':
+      const accountExternalAccountCreated = event.data.object;
+
+      console.log("accountExternalAccountCreated: ", accountExternalAccountCreated)
+      console.log("account.external_account.created: ", account.external_account.created)
+
+      // Then define and call a function to handle the event account.external_account.created
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
+});
 
 
 module.exports = router;

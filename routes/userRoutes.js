@@ -33,9 +33,6 @@ router.post('/register', async (req, res, next) => {
   const { credentials } = req.body
   const { firstName, lastName, email, password, password_confirmation } = credentials
 
-  console.log("firstName", firstName);
-  console.log("lastName", lastName)
-
   try {
     if (!firstName || !lastName || !email || !password || password !== password_confirmation) {
       res.json({msg: "registration failed"})
@@ -182,20 +179,14 @@ router.patch('/user/:id/update-id', requireToken, async (req, res, next) => {
 // UPODATE USERS PROFILE IMAGE
 router.put('/user-image-update', requireToken, async (req, res, next) => {
   let newImageUrl = req.body.data;
-  console.log("New Image URL type: ", typeof newImageUrl);
-  console.log("New Image URL: ", newImageUrl);
 
   let userID = req.user._id
 
   let user = await User.findById(userID)
   
-  console.log("user found in db: ", user)
-
   user.picture = newImageUrl;
   
   let updatedUser = await user.save();
-
-  console.log("UPDATED USER: ", updatedUser)
 
   res.json({ updatedUser })
 })

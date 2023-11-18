@@ -10,14 +10,7 @@ const Album = require('../models/albumModel');
 
 // create new image within an album
 router.post('/newimage', requireToken, async (req, res, next) => {
-  console.log("user: ", req.user);
-  console.log("req body data: ", req.body.data.albumID);
-  console.log("req body: ", req.body);
-  console.log(req.user)
-
   const album = await Album.findById(req.body.data.albumID)
-
-  console.log("album: ", album)
 
   const name = req.user.firstName + " " + req.user.lastName
 
@@ -39,9 +32,6 @@ router.post('/newimage', requireToken, async (req, res, next) => {
       { new: true }
     );
 
-    console.log("updated user: ", updatedAlbum);
-    console.log(newImage);
-
     res.status(201).json({ msg: 'image created' });
   } catch(error) {
     res.status(500).json({ msg: 'Error creating image' });
@@ -58,14 +48,10 @@ router.get('/recent/images', async (req, res, next) => {
     twoDaysAgo.setDate(today.getDate() - 6);
 
     let images = await Image.find({
-      createdAt: {
-        $gte: twoDaysAgo,
-        $lt: today,
-      }, 
       purchased: false
     })
     
-    const limitedImagesArr = images.slice(0, 20);
+    const limitedImagesArr = images.slice(0, 12);
     res.json({ images: limitedImagesArr })
   } catch(error) {
     console.log(error)
@@ -74,10 +60,7 @@ router.get('/recent/images', async (req, res, next) => {
 
 // read all images from an album
 router.get(`/album/:id/images`, async (req, res, next) => {
-  console.log("req.params.id: ", req.params.id)
-
   const album = await Album.findById(req.params.id);
-  console.log("album", album)
 
   let imageArr = []
 
@@ -97,13 +80,8 @@ router.get(`/album/:id/images`, async (req, res, next) => {
 // update a single image
 router.put('/imageprice/:id', requireToken, async (req, res, next) => {
   const image = await Image.findById(req.params.id)
-  console.log("image: ", image);
-  console.log("req.body: ", req.body);
 
   const { price, discountPrice } = req.body.data
-  
-  console.log("price", price)
-  console.log("discountPrice", discountPrice)
 
   try {
     if (price) {

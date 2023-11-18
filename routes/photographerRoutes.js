@@ -23,7 +23,6 @@ router.get('/photographer/:id', async (req, res, next) => {
 router.get(`/featuredPhotographers`, async (req, res, next) => {
   try {
     const users = await User.find({ isPhotographer: true })
-    console.log(users)
     res.json({ users: users })
   } catch(error) {
     console.log(error)
@@ -33,11 +32,9 @@ router.get(`/featuredPhotographers`, async (req, res, next) => {
 // search for photographers
 router.post(`/photographers/search`, async (req, res, next) => {
   let value = req.body.searchValue
-  console.log(value)
 
   try {
     let photographers = await User.find({ isPhotographer: true, fullName:{ $regex: new RegExp(`^${value}`, 'i') } })
-    console.log(photographers)
     const limitedArr = photographers.slice(0, 10);
     res.json({ users: limitedArr })
   } catch(err) {
@@ -56,12 +53,10 @@ router.patch(`/photographer/:id/subscribe`, requireToken, async (req, res, next)
     // add user to photographers subscribers
     user.subscribedTo.push(photographer);
     let updatedUser = await user.save();
-    console.log("updated user:", updatedUser);
 
     // add photographer to users subscribedTo
     photographer.subscribers.push(user);
     let updatedPhotographer = await photographer.save();
-    console.log("updated photographer:", updatedPhotographer);
 
     res.json({ user: updatedUser });
   } catch (error) {

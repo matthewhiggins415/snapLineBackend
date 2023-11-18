@@ -16,6 +16,7 @@ const firebaseRoutes = require('./routes/firebase');
 const albumRoutes = require('./routes/albumRoutes.js');
 const imageRoutes = require('./routes/imageRoutes.js');
 const photographerRoutes = require('./routes/photographerRoutes.js');
+const faqRoutes = require('./routes/faqRoutes.js');
 
 // connect to db
 const connectDB = async () => {
@@ -51,6 +52,7 @@ app.use(firebaseRoutes);
 app.use(albumRoutes);
 app.use(imageRoutes);
 app.use(photographerRoutes);
+app.use(faqRoutes);
 
 const port = process.env.PORT || 5000
 
