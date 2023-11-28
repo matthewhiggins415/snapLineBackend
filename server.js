@@ -36,13 +36,8 @@ connectDB();
 
 const app = express();
 
-app.use(cors({
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204,
-}));
-
+app.use(cors({ origin: ['https://pixmarketplace.com', 'http://localhost:8080'] }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
