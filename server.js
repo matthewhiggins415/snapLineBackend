@@ -36,15 +36,12 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: ['https://pixmarketplace.com', 'http://localhost:8080'] }));
-
-// Enable CORS for all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://pixmarketplace.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+app.use(cors({
+  origin: 'https://pixmarketplace.com',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
