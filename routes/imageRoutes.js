@@ -15,6 +15,7 @@ router.post('/newimage', requireToken, async (req, res, next) => {
   const name = req.user.firstName + " " + req.user.lastName
 
   const imgObj = {
+    firebaseName: req.body.data.firebaseName,
     album: req.body.data.albumID,
     url: req.body.data.imgURL,
     photographer: req.user._id,

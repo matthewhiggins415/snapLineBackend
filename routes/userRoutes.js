@@ -5,6 +5,9 @@ const crypto = require('crypto')
 const passport = require('passport')
 // bcrypt docs: https://github.com/kelektiv/node.bcrypt.js
 const bcrypt = require('bcrypt')
+const mongoose = require('mongoose');
+const dotenv = require("dotenv");
+dotenv.config();
 
 // see above for explanation of "salting", 10 rounds is recommended
 const bcryptSaltRounds = 10
@@ -18,6 +21,8 @@ const nodemailer = require('nodemailer');
 // const BadCredentialsError = errors.BadCredentialsError
 
 const User = require('../models/userModel')
+const Image = require('../models/imageModel')
+const Album = require('../models/albumModel')
 
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
@@ -25,10 +30,18 @@ const User = require('../models/userModel')
 const requireToken = passport.authenticate('bearer', { session: false })
 
 // instantiate a router (mini app that only handles routes)
+const admin = require('firebase-admin');
+const serviceAccount = require("../lib/firebaseConfig.js");
+const firebaseStorageBucket = process.env.FIREBASE_STORAGE_BUCKET;
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount), 
+  storageBucket: firebaseStorageBucket,
+});
+
 const router = express.Router()
 
 // SIGN UP
-// works
 router.post('/register', async (req, res, next) => {
   const { credentials } = req.body
   const { firstName, lastName, email, password, password_confirmation } = credentials
@@ -88,7 +101,6 @@ router.post('/register', async (req, res, next) => {
   
 
 // SIGN IN
-// works 
 router.post('/login', async (req, res, next) => {
   try {
     const pw = req.body.credentials.password  
@@ -158,24 +170,6 @@ router.patch('/user/:id/update-id', requireToken, async (req, res, next) => {
 
 })
 
-
-// add photographer to users subscribedTo
-
-//update a users shipping address 
-// router.patch('/user/address/:id', requireToken, (req, res, next) => {
-//   let id = req.params.id
-//   let data = req.body.updatedAddress
-
-//   User.findOneAndUpdate({_id: id}, {shippingAddress: data, shippingValid: true}, {new: true}, (err, updatedRecord) => {
-//     if (err) {
-//       console.log(err)
-//     } else {
-//       console.log(updatedRecord)
-//       res.json({updatedRecord})
-//     }
-//   })
-// })
-
 // UPODATE USERS PROFILE IMAGE
 router.put('/user-image-update', requireToken, async (req, res, next) => {
   let newImageUrl = req.body.data;
@@ -192,7 +186,6 @@ router.put('/user-image-update', requireToken, async (req, res, next) => {
 })
 
 // LOGOUT 
-// works
 router.delete('/logout', requireToken, (req, res, next) => {
   // create a new random token for the user, invalidating the current one
   req.user.token = null
@@ -209,26 +202,78 @@ router.get('/user/:id', async (req, res) => {
   res.json({ user: user })
 })
 
-// router.patch('/user/:id/sub_success', requireToken, async (req, res, next) => {
-//   let id = req.params.id
-//   let user = await User.findById(id)
-
-//   const { sessionId } = req.body
-
-//   if (user.subscribed === false) {
-//     user.subscribed = true
-//     user.sessionId = sessionId
-//     const updatedUser = await user.save()
-//     res.json({ user: updatedUser })
-//   } else {
-//     res.json({ user: user })
-//   }
-// })
-
 // GET ALL USERS
 router.get('/users', requireToken, async (req, res, next) => {
   let users = await User.find()
   res.json({ users: users })
+})
+
+// DELETE A USER
+router.delete(`/user/:id`, requireToken, async (req, res, next) => {
+  let id = req.params.id;
+
+  const photographerObjectId = new mongoose.Types.ObjectId(id);
+  console.log("photographerObjectId: ", photographerObjectId);
+
+  // remove from stripe
+  // remove images from firebase
+
+  try {
+    let user = await User.findById(photographerObjectId);
+    console.log("user: ", user);
+  
+    // removes this photographer from the subscribedTo field of any user that subbed.
+    for (const subscriber of user.subscribers) {
+      subStr = subscriber.toString();
+      const sub = await User.findById(subStr);
+      console.log("sub to remove", photographerObjectId);
+      console.log("subscribed to:", sub?.subscribedTo);
+      const filteredSubscribers = sub?.subscribedTo.filter(subscriber => subscriber.toString() !== id);
+      console.log("filtered subscribed to:", filteredSubscribers);
+      sub.subscribedTo = filteredSubscribers;
+      await sub.save();
+    }
+  
+    // removes this photographer from the subscribers field of any user they subscribed to.
+    for (const subbedTo of user.subscribedTo) {
+      stringId = subbedTo.toString()
+      let subbedToUser = await User.findById(stringId);
+      const filteredSubscribers = subbedToUser?.subscribers.filter(subscriber => subscriber.toString() !== id);
+      subbedToUser.subscribers = filteredSubscribers;
+      await subbedToUser.save();
+      console.log("subbed to:", subbedToUser)
+    }
+  
+  
+    // if user is a photographer then delete their albums and images
+    if (user.isPhotographer === true && user.albums.length > 0) {
+      // remove image from firebase
+      let imgArr = await Image.find({ photographer: photographerObjectId })
+      console.log("imgArr", imgArr)
+
+      const bucket = admin.storage().bucket();
+
+      for (const img of imgArr) {
+        const imagePath = `images/${img.firebaseName}`;
+        await bucket.file(imagePath).delete();
+      }
+
+      const albumDeleteResult = await Album.deleteMany({ owner: user._id });
+      console.log("albumDeleteResult", albumDeleteResult);
+  
+      let imagesDeleteResult = await Image.deleteMany({ photographer: user._id })
+      console.log('imagesDeleteResult: ', imagesDeleteResult)
+    }
+
+    await User.findByIdAndDelete(photographerObjectId);
+
+    res.json({ msg: "successfully deleted user"})
+
+  } catch(error) {
+    console.log("error", error)
+  }
+
+
 })
 
 module.exports = router

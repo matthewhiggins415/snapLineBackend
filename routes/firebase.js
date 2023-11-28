@@ -8,6 +8,10 @@ const Album = require('../models/albumModel');
 const Image = require('../models/imageModel');
 const { ObjectId } = require('mongodb');
 const { v4: uuidv4 } = require('uuid');
+const dotenv = require("dotenv");
+dotenv.config();
+const express = require('express');
+const router = express.Router();
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -15,19 +19,14 @@ const { v4: uuidv4 } = require('uuid');
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDkoK_e-sYQ_iByA8d5vvdlBHULwLrPLvk",
-  authDomain: "snapline-33f1c.firebaseapp.com",
-  projectId: "snapline-33f1c",
-  storageBucket: "snapline-33f1c.appspot.com",
-  messagingSenderId: "1064962047160",
-  appId: "1:1064962047160:web:d282f47a3c7d5e135ac84d",
-  measurementId: "G-T8TQ2P89E1"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID
 };
-
-const dotenv = require("dotenv");
-dotenv.config();
-const express = require('express');
-const router = express.Router();
 
 const { getStorage, ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 
@@ -46,7 +45,8 @@ router.post('/upload', requireToken, upload.array('images', 10), async (req, res
   }
 
   const uuid = uuidv4();
-  const storageRef = ref(storage, `/images/image${uuid}.jpg`);
+  let name = `${uuid}.jpg`
+  const storageRef = ref(storage, `/images/${name}`);
   const file = req.files[0]
 
   try {
@@ -55,7 +55,7 @@ router.post('/upload', requireToken, upload.array('images', 10), async (req, res
 
     // Get the download URL for the uploaded file
     const downloadURL = await getDownloadURL(storageRef);
-    res.status(201).json({ msg: 'file uploaded', downloadURL: downloadURL });
+    res.status(201).json({ msg: 'file uploaded', downloadURL: downloadURL, firebaseName: name });
   } catch (error) {
     throw new Error('Error uploading images to Firebase Storage.');
   }
