@@ -70,28 +70,28 @@ router.post('/register', async (req, res, next) => {
     await user.save()
 
     // send email 
-    let transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.EMAIL_ADDRESS, // your Gmail address
-        pass: process.env.EMAIL_PASS,    // your Gmail password
-      },
-    });
+    // let transporter = nodemailer.createTransport({
+    //   service: 'Gmail',
+    //   auth: {
+    //     user: process.env.EMAIL_ADDRESS, // your Gmail address
+    //     pass: process.env.EMAIL_PASS,    // your Gmail password
+    //   },
+    // });
     
-    let mailOptions = {
-      from: process.env.EMAIL_ADDRESS,
-      to: email,
-      subject: 'Welcome to PIX Marketplace',
-      text: `Hey there, your account has been created`
-    };
+    // let mailOptions = {
+    //   from: process.env.EMAIL_ADDRESS,
+    //   to: email,
+    //   subject: 'Welcome to PIX Marketplace',
+    //   text: `Hey there, your account has been created`
+    // };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
     res.json({ user: user })
   } catch (err) {
