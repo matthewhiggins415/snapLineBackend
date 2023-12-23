@@ -36,14 +36,9 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ 
-  origin: ['https://git.heroku.com/pix-marketplace.git', 'pixmarketplace.com', 'https://pixmarketplace.com', 'http://localhost:3000'],
-  credentials: true
-}))
-
+app.use(cors())
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
 
 app.get('/', (req, res) => {
   res.json({ message: `here's process.env.NODE_ENV: ${process.env.NODE_ENV}` });
