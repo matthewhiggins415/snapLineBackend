@@ -21,7 +21,7 @@ const faqRoutes = require('./routes/faqRoutes.js');
 // connect to db
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(`mongodb+srv://${process.env.MONGO_URI_USERNAME}:${process.env.MONGO_URI_PW}@snapline.20yggtd.mongodb.net/`, {
+    const conn = await mongoose.connect(`mongodb+srv://mhigginslouis:AUrVQMMSGXeScKqt@snapline.20yggtd.mongodb.net/`, {
       useNewUrlParser: true
     });
     
